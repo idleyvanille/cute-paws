@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Cute Paws 🐾</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+
+body{
+margin:0;
+font-family:'Quicksand', sans-serif;
+background:white;
+text-align:center;
+}
+
+/* Header */
+
+header{
+font-family:'Bungee', cursive;
+font-size:60px;
+padding:25px;
+background:linear-gradient(90deg,#ffb3d9,#ffe3a3,#b3f0ff);
+}
+
+/* Subtitle */
+
+.subtitle{
+font-size:20px;
+margin-bottom:10px;
+}
+
+/* Paw background */
+
+body::before{
+content:"🐾 🐾 🐾 🐾 🐾 🐾 🐾 🐾";
+position:fixed;
+top:0;
+left:0;
+width:100%;
+opacity:0.08;
+font-size:50px;
+pointer-events:none;
+}
+
+/* Buttons */
+
+button{
+padding:8px 15px;
+border:none;
+border-radius:10px;
+background:#ff86c5;
+color:white;
+cursor:pointer;
+font-family:'Quicksand';
+margin:5px;
+}
+
+/* Gallery */
+
+.gallery{
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+gap:25px;
+padding:30px;
+}
+
+.card{
+width:260px;
+background:#fff6fb;
+padding:10px;
+border-radius:20px;
+box-shadow:0 6px 15px rgba(0,0,0,0.12);
+}
+
+.card img{
+width:100%;
+border-radius:15px;
+}
+
+.caption{
+margin-top:6px;
+font-weight:600;
+}
+
+.like{
+cursor:pointer;
+}
+
+/* Featured */
+
+#featured img{
+width:250px;
+border-radius:15px;
+}
+
+/* Leaderboard */
+
+#leaderboard{
+background:#fff2f8;
+padding:15px;
+margin:20px;
+border-radius:12px;
+}
+
+.admin{
+margin-top:30px;
+}
+
+#adminPanel{
+display:none;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>Cute Paws 🐾</header>
+
+<div class="subtitle">Cute cats and dogs from around the internet</div>
+
+<!-- FILTERS -->
+
+<button onclick="filterPets('all')">All</button>
+<button onclick="filterPets('cat')">Cats</button>
+<button onclick="filterPets('dog')">Dogs</button>
+
+<!-- PET OF DAY -->
+
+<h2>⭐ Pet of the Day</h2>
+<div id="featured"></div>
+
+<!-- GALLERY -->
+
+<div class="gallery" id="gallery">
+
+<div class="card" data-type="cat">
+<img src="https://placekitten.com/300/200">
+<div class="caption">Sleepy kitten 🐱</div>
+<div class="like" onclick="like(this)">❤️ 0</div>
+</div>
+
+<div class="card" data-type="dog">
+<img src="https://placedog.net/300/200">
+<div class="caption">Happy puppy 🐶</div>
+<div class="like" onclick="like(this)">❤️ 0</div>
+</div>
+
+</div>
+
+<!-- LEADERBOARD -->
+
+<div id="leaderboard">
+<h3>🏆 Most Loved Pets</h3>
+<ul id="topPets"></ul>
+</div>
+
+<!-- ADMIN -->
+
+<div class="admin">
+
+<h3>Admin Login</h3>
+
+<input type="password" id="password">
+<button onclick="login()">Login</button>
+
+<div id="adminPanel">
+
+<h4>Add Pet</h4>
+
+<input type="file" id="imageUpload"><br>
+<input type="text" id="captionText" placeholder="Caption"><br>
+
+<select id="type">
+<option value="cat">Cat</option>
+<option value="dog">Dog</option>
+</select><br>
+
+<button onclick="addPet()">Add Pet</button>
+
+</div>
+
+</div>
+
+<script>
+
+/* LOGIN */
+
+function login(){
+
+if(document.getElementById("password").value==="CherryCupcake@67"){
+
+document.getElementById("adminPanel").style.display="block";
+
+alert("Admin access granted 🐾");
+
+}else{
+
+alert("Wrong password");
+
+}
+
+}
+
+/* ADD PET */
+
+function addPet(){
+
+let file=document.getElementById("imageUpload").files[0];
+let caption=document.getElementById("captionText").value;
+let type=document.getElementById("type").value;
+
+if(!file)return;
+
+let reader=new FileReader();
+
+reader.onload=function(e){
+
+let card=document.createElement("div");
+
+card.className="card";
+card.dataset.type=type;
+
+card.innerHTML=
+`<img src="${e.target.result}">
+<div class="caption">${caption}</div>
+<div class="like" onclick="like(this)">❤️ 0</div>`;
+
+document.getElementById("gallery").appendChild(card);
+
+setPetOfDay();
+
+};
+
+reader.readAsDataURL(file);
+
+}
+
+/* LIKE */
+
+function like(el){
+
+let n=parseInt(el.innerText.split(" ")[1]);
+n++;
+
+el.innerText="❤️ "+n;
+
+updateLeaderboard();
+
+}
+
+/* PET OF DAY */
+
+function setPetOfDay(){
+
+let pets=document.querySelectorAll(".card img");
+
+let r=Math.floor(Math.random()*pets.length);
+
+document.getElementById("featured").innerHTML=
+`<img src="${pets[r].src}">`;
+
+}
+
+setPetOfDay();
+
+/* FILTER */
+
+function filterPets(type){
+
+let cards=document.querySelectorAll(".card");
+
+cards.forEach(c=>{
+
+if(type==="all"||c.dataset.type===type)
+c.style.display="block";
+else
+c.style.display="none";
+
+});
+
+}
+
+/* LEADERBOARD */
+
+function updateLeaderboard(){
+
+let pets=document.querySelectorAll(".card");
+
+let list=[];
+
+pets.forEach(p=>{
+
+let likes=parseInt(p.querySelector(".like").innerText.split(" ")[1]);
+
+let caption=p.querySelector(".caption").innerText;
+
+list.push({caption,likes});
+
+});
+
+list.sort((a,b)=>b.likes-a.likes);
+
+let html="";
+
+list.slice(0,5).forEach(p=>{
+
+html+=`<li>${p.caption} ❤️ ${p.likes}</li>`;
+
+});
+
+document.getElementById("topPets").innerHTML=html;
+
+}
+
+updateLeaderboard();
+
+</script>
+
+</body>
+</html>
